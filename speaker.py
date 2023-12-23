@@ -3,6 +3,14 @@
 from bark import SAMPLE_RATE, generate_audio, preload_models
 import sounddevice as sd
 
+# Check if running in IPython environment
+try:
+    get_ipython
+    from IPython.display import Audio
+    in_ipython = True
+except NameError:
+    in_ipython = False
+
 class TextToAudioConverter:
     def __init__(self):
         preload_models()
@@ -22,5 +30,11 @@ if __name__ == "__main__":
 
     audio_array, sample_rate = text_converter.convert_text_to_audio(text_prompt)
 
-    # Play the audio using sounddevice
-    sd.play(audio_array, sample_rate, blocking=True)
+    if in_ipython:
+        # If in IPython, use IPython.display.Audio for playback
+        from IPython.display import Audio
+        audio_output = Audio(audio_array, rate=SAMPLE_RATE)
+        audio_output
+    else:
+        # If not in IPython, use sounddevice for playback
+        sd.play(audio_array, sample_rate, blocking=True)
